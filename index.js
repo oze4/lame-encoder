@@ -46,7 +46,7 @@ app.post('/upload', async (req, res) => {
 
 // Home page
 app.get('*', (req, res) => {
-    res.status(404).send(`
+    res.status(200).send(`
     <!DOCTYPE html>
     <html>
     <body>
