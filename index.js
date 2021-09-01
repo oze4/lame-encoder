@@ -37,6 +37,7 @@ app.post('/upload', async (req, res) => {
     res.status(500).send(encodingError);
   }
 
+  // Removed files we saved on disk
   res.on('finish', async () => {
     await fs.unlinkSync(filePath);
     await fs.unlinkSync(outputPath);
@@ -52,13 +53,13 @@ app.get('*', (req, res) => {
 
     <p id="status"></p>
 
-    <form method="post" enctype="multipart/form-data" action="/upload" onsubmit="send(event, this)">
+    <form method="post" enctype="multipart/form-data" action="/upload" onsubmit="handleOnSubmit(event, this)">
       <input name="uploadedFile" type="file" />
       <button id="submit">Submit Query</button>
     </form>
 
     <script>
-    async function send(e,form) {
+    async function handleOnSubmit(e,form) {
       const statusEl = document.getElementById("status");
       statusEl.innerHTML = "Uploading ...";
       e.preventDefault();
@@ -71,26 +72,6 @@ app.get('*', (req, res) => {
       }).click();
       statusEl.innerHTML = "Done. Check your console.";
     }
-
-    function base64ToArrayBuffer(base64) {
-      const binaryString = window.atob(base64);
-      const binaryLen = binaryString.length;
-      const bytes = new Uint8Array(binaryLen);
-      for (let i = 0; i < binaryLen; i++) {
-         const ascii = binaryString.charCodeAt(i);
-         bytes[i] = ascii;
-      }
-      return bytes;
-    }
-
-    function saveByteArray(filename, byte) {
-      const blob = new Blob([byte], { type: "audio/mp3" });
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      const fileName = file;
-      link.download = fileName;
-      link.click();
-    };
     </script>
 
     </body>
