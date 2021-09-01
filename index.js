@@ -19,24 +19,28 @@ app.post('/upload', async (req, res) => {
     return;
   }
 
-  const filePath = path.resolve('./uploads', fileToEncode.name + '-encoded.mp3');
-  console.log(filePath)
+  const filePath = path.resolve('./uploads', fileToEncode.name);
+  const outputPath = path.resolve('./uploads', fileToEncode.name + '-encoded.mp3');
+
   // Save uploaded file to disk
   await fileToEncode.mv(filePath);
 
   try {
     const encoder = new Lame({ 
-      output: 'buffer',
+      output: outputPath,
       bitrate: 8,
     }).setFile(filePath);
     await encoder.encode();
-    res.download(filePath);
+    res.download(outputPath);
   } catch (encodingError) {
     console.error(encodingError);
     res.status(500).send(encodingError);
   }
 
-  res.on('finish', async () => await fs.unlinkSync(filePath))
+  res.on('finish', async () => {
+    await fs.unlinkSync(filePath);
+    await fs.unlinkSync(outputPath);
+  })
 });
 
 // Home page
